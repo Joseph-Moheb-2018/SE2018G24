@@ -1,4 +1,4 @@
-
+//students.php
 <?php 
 	include_once('./controllers/common.php');
 	include_once('./components/head.php');
@@ -64,3 +64,811 @@
 		});
 	});
 </script>
+
+
+//index.php
+
+
+<?php include_once('./controllers/common.php') ?>
+<?php include_once('./components/head.php') ?>
+
+    <h1 class="mt-5">School Information System</h1>
+    <p class="lead">Manage school information like students, course and grades</code>.</p>
+
+<?php include_once('./components/tail.php') ?>
+
+
+
+
+
+//grades.php
+
+<?php
+	include_once('./controllers/common.php');
+	include_once('./components/head.php');
+	include_once('C:/xampp/htdocs/school/real/grade.php');
+	Database::connect('school', 'root', '');
+?>
+	<div style="padding: 10px 0px 10px 0px; vertical-align: text-bottom;">
+		<span style="font-size: 125%;">Grades</span>
+	</div>
+
+    <table class="table table-striped">
+    	<thead>
+	    	<tr>
+	      		<th scope="col">StudentID</th>
+	      		<th scope="col">CourseID</th>
+	      		<th scope="col">Degree</th>
+            <th scope="col">Date</th>
+	    	</tr>
+	  	</thead>
+	  	<tbody>
+		  	<?php
+				$students = Grade::all(safeGet('keywords'));
+				foreach ($students as $student) {
+			?>
+    		<tr>
+    			<td><?=$student->student_id?></td>
+    			<td><?=$student->course_id?></td>
+          <td><?=$student->degree?></td>
+          <td><?=$student->examine_at?></td>
+    			<td>
+    				<button class="button edit_grade" id="<?=$student->id?>">Edit</button>&nbsp;
+    				<button class="button delete_grade" id="<?=$student->id?>">Delete</button>
+				</td>
+    		</tr>
+    		<?php } ?>
+    	</tbody>
+    </table>
+
+<?php include_once('./components/tail.php') ?>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.edit_grade').click(function(event) {
+			window.location.href = "editgrade.php?id="+$(this).attr('id');
+		});
+
+		$('.delete_grade').click(function(){
+			var anchor = $(this);
+			$.ajax({
+				url: './controllers/deletegrade.php',
+				type: 'GET',
+				dataType: 'json',
+				data: {id: anchor.attr('id')},
+			})
+			.done(function(reponse) {
+				if(reponse.status==1) {
+					anchor.closest('tr').fadeOut('slow', function() {
+						$(this).remove();
+					});
+				}
+			})
+			
+		});
+	});
+</script>
+
+
+
+
+
+
+
+//grade.php
+
+
+<?php include_once('./components/head.php') ?>
+
+
+<?php include_once('./components/tail.php');
+
+include_once('C:\xampp\htdocs\school\real\models/database.php');
+
+class Grade extends Database{
+  function __construct($id) {
+    $sql = "SELECT * FROM grades WHERE id = $id;";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    if(empty($data)){return;}
+    foreach ($data as $key => $value) {
+      $this->{$key} = $value;
+    }
+  }
+
+  public static function add($student_id,$course_id,$degree,$examine_at) {
+    $sql = "INSERT INTO `grades` (student_id,course_id,degree,examine_at) VALUES (?,?,?,?)";
+    Database::$db->prepare($sql)->execute([$student_id,$course_id,$degree,$examine_at]);
+  }
+
+
+  public function delete() {
+    $sql = "DELETE FROM grades WHERE id = $this->id;";
+    Database::$db->query($sql);
+  }
+
+
+  public function save() {
+    $sql = "UPDATE grades SET student_id = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->student_id, $this->id]);
+    $sql = "UPDATE grades SET course_id = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->course_id, $this->id]);
+    $sql = "UPDATE grades SET degree = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->degree, $this->id]);
+    $sql = "UPDATE grades SET examine_at = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->examine_at, $this->id]);
+  }
+
+  public static function all($keyword) {
+    $keyword = str_replace(" ", "%", $keyword);
+    $sql = "SELECT * FROM grades WHERE student_id like ('%$keyword%');";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $students = [];
+    while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+      $students[] = new Grade($row['id']);
+    }
+    return $students;
+  }
+}
+
+
+
+
+
+
+
+ ?>
+ 
+ 
+ 
+ 
+ //editstudent.php
+ 
+ 
+ <?php 
+	include_once("./controllers/common.php");
+	include_once('./components/head.php');
+	include_once('./models/student.php');
+	$id = safeGet('id');
+	Database::connect('school', 'root', '');
+	$student = new Student($id);
+?>
+
+    <h2 class="mt-4"><?=($id)?"Edit":"Add"?> Student</h2>
+
+    <form action="controllers/savestudent.php" method="post">
+    	<input type="hidden" name="id" value="<?=$student->get('id')?>">
+		<div class="card">
+			<div class="card-body">
+				<div class="form-group row gutters">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="name" value="<?=$student->get('name')?>" required>
+					</div>
+				</div>
+		    	<div class="form-group">
+		    		<button class="button float-right" type="submit">Add</button>
+		    	</div>
+		    </div>
+		</div>
+    </form>
+
+<?php include_once('./components/tail.php') ?>
+
+
+
+
+//editgrade.php
+
+<?php
+	include_once("./controllers/common.php");
+	include_once('./components/head.php');
+	include_once('C:/xampp/htdocs/school/real/models/grade.php');
+	$id = safeGet('id');
+	Database::connect('school', 'root', '');
+	$student = new Grade($id);
+?>
+
+    <h2 class="mt-4"><?=($id)?"Edit":"Add"?> Grade</h2>
+
+    <form action="controllers/savegrade.php" method="post">
+    	<input type="hidden" name="id" value="<?=$student->get('id')?>">
+		<div class="card">
+			<div class="card-body">
+				<div class="form-group row gutters">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Student ID</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="student_id" value="<?=$student->get('student_id')?>" required>
+					</div>
+
+          <label for="inputEmail3" class="col-sm-2 col-form-label">CourseID</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="course_id" value="<?=$student->get('course_id')?>" required>
+					</div>
+
+          <label for="inputEmail3" class="col-sm-2 col-form-label">Degree</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="degree" value="<?=$student->get('degree')?>" required>
+					</div>
+
+          <label for="inputEmail3" class="col-sm-2 col-form-label">Examined_at</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="examine_at" value="<?=$student->get('examine_at')?>" required>
+					</div>
+				</div>
+		    	<div class="form-group">
+		    		<button class="button float-right" type="submit">Submit Edit</button>
+		    	</div>
+		    </div>
+		</div>
+    </form>
+
+<?php include_once('./components/tail.php') ?>
+
+
+
+
+//editcourse.php
+
+
+
+<?php
+	include_once("./controllers/common.php");
+	include_once('./components/head.php');
+	include_once('C:\xampp\htdocs\school\real/courses.php');
+	$id = safeGet('id');
+	Database::connect('school', 'root', '');
+	$student = new Courses($id);
+?>
+
+    <h2 class="mt-4"><?=($id)?"Edit":"Add"?> Courses</h2>
+
+    <form action="controllers/saveCourse.php" method="post">
+    	<input type="hidden" name="id" value="<?=$student->get('id')?>">
+		<div class="card">
+			<div class="card-body">
+				<div class="form-group row gutters">
+					<label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="name" value="<?=$student->get('name')?>" required>
+					</div>
+
+          <label for="inputEmail3" class="col-sm-2 col-form-label">Max Degree</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="max_degree" value="<?=$student->get('max_degree')?>" required>
+					</div>
+          <br>
+
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">Study Year</label>
+          					<div class="col-sm-10">
+          						<input class="form-control" type="text" name="study_year" value="<?=$student->get('study_year')?>" required>
+          					</div>
+
+				</div>
+
+          <div class="form-group">
+		    		<button class="button float-right" type="submit">Add</button>
+		    	</div>
+
+		    </div>
+		</div>
+    </form>
+
+<?php include_once('./components/tail.php') ?>
+
+
+
+//courses.php
+
+
+<?php include_once('./components/head.php') ?>
+
+
+<?php include_once('./components/tail.php');
+
+include_once('C:\xampp\htdocs\school\real\models/database.php');
+
+class Courses extends Database{
+  function __construct($id) {
+    $sql = "SELECT * FROM courses WHERE id = $id;";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    if(empty($data)){return;}
+    foreach ($data as $key => $value) {
+      $this->{$key} = $value;
+    }
+  }
+
+  public static function add($name,$max_degree,$study_year) {
+    $sql = "INSERT INTO courses (name,max_degree,study_year) VALUES (?,?,?)";
+    Database::$db->prepare($sql)->execute([$name,$max_degree,$study_year]);
+
+  }
+
+
+  public function delete() {
+    $sql = "DELETE FROM courses WHERE id = $this->id;";
+    Database::$db->query($sql);
+  }
+
+
+  public function save() {
+    $sql = "UPDATE courses SET name = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->name, $this->id]);
+    $sql = "UPDATE courses SET max_degree = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->max_degree, $this->id]);
+    $sql = "UPDATE courses SET study_year = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->study_year, $this->id]);
+  }
+
+  public static function all($keyword) {
+    $keyword = str_replace(" ", "%", $keyword);
+    $sql = "SELECT * FROM courses WHERE name like ('%$keyword%');";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $students = [];
+    while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+      $students[] = new Courses($row['id']);
+    }
+    return $students;
+  }
+}
+
+
+
+
+
+
+
+ ?>
+ 
+ 
+ 
+ 
+ 
+ //course.php
+ 
+ 
+ <?php
+	include_once('./controllers/common.php');
+	include_once('./components/head.php');
+	include_once('./courses.php');
+	Database::connect('school', 'root', '');
+?>
+<div style="padding: 15px 0px 15px 0px; vertical-align: text-bottom;">
+  <span style="font-size: 125%;">Courses</span>
+  <button class="button float-right edit_Course" id="0">Add Course</button>
+</div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Max Degree</th>
+          <th scope="col">study Year</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $students = Courses::all(safeGet('keywords'));
+      foreach ($students as $student) {
+    ?>
+      <tr>
+        <td><?=$student->id?></td>
+        <td><?=$student->name?></td>
+        <td><?=$student->max_degree?></td>
+        <td><?=$student->study_year?></td>
+        <td>
+          <button class="button edit_Course" style="margin-left: 50px;" id="<?=$student->id?>">Edit</button>&nbsp;
+          <button class="button delete_Course" id="<?=$student->id?>">Delete</button>
+      </td>
+      </tr>
+      <?php } ?>
+    </tbody>
+  </table>
+
+<?php include_once('./components/tail.php')
+//style="margin-top:10px;"
+//
+ ?>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.edit_Course').click(function(event) {
+			window.location.href = "editcourse.php?id="+$(this).attr('id');
+		});
+
+		$('.delete_Course').click(function(){
+			var anchor = $(this);
+			$.ajax({
+				url: './controllers/deletecourse.php',
+				type: 'GET',
+				dataType: 'json',
+				data: {id: anchor.attr('id')},
+			})
+			.done(function(reponse) {
+				if(reponse.status==1) {
+					anchor.closest('tr').fadeOut('slow', function() {
+						$(this).remove();
+					});
+				}
+			})
+			
+		});
+	});
+</script>
+
+
+
+
+
+
+
+//database.php
+
+<?php
+	class Database {
+		protected static $db = null;
+
+		public static function connect($database, $uid, $pwd) {
+			if(!empty(Database::$db)) return;
+
+			$dsn = "mysql:host=localhost;dbname=$database";
+
+			try {
+		   		Database::$db = new PDO($dsn, $uid, $pwd);
+			} catch(PDOException $e){
+		   		echo $e->getMessage();
+			}
+		}
+
+		public function get($field) {
+			if(isset($this->{$field}))
+				return $this->{$field};
+			return null;
+		}
+	}
+?>
+
+
+
+//grade.php
+
+
+
+<?php include_once('./components/head.php') ?>
+
+
+<?php include_once('./components/tail.php');
+
+include_once('C:\xampp\htdocs\school\real\models/database.php');
+
+class Grade extends Database{
+  function __construct($id) {
+    $sql = "SELECT * FROM grades WHERE id = $id;";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    if(empty($data)){return;}
+    foreach ($data as $key => $value) {
+      $this->{$key} = $value;
+    }
+  }
+
+  public static function add($student_id,$course_id,$degree,$examine_at) {
+    $sql = "INSERT INTO students (student_id,course_id,degree,examine_at) VALUES (?,?,?,?)";
+    Database::$db->prepare($sql)->execute([$student_id,$course_id,$degree,$examine_at]);
+  }
+
+
+  public function delete() {
+    $sql = "DELETE FROM grades WHERE id = $this->id;";
+    Database::$db->query($sql);
+  }
+
+
+  public function save() {
+    $sql = "UPDATE grades SET student_id = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->student_id, $this->id]);
+    $sql = "UPDATE grades SET course_id = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->course_id, $this->id]);
+    $sql = "UPDATE grades SET degree = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->degree, $this->id]);
+    $sql = "UPDATE grades SET examine_at = ? WHERE id = ?;";
+    Database::$db->prepare($sql)->execute([$this->examine_at, $this->id]);
+  }
+
+  public static function all($keyword) {
+    $keyword = str_replace(" ", "%", $keyword);
+    $sql = "SELECT * FROM grades WHERE student_id like ('%$keyword%');";
+    $statement = Database::$db->prepare($sql);
+    $statement->execute();
+    $students = [];
+    while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+      $students[] = new Grade($row['id']);
+    }
+    return $students;
+  }
+}
+
+
+
+
+
+
+
+ ?>
+
+
+
+
+
+//student.php
+
+
+
+<?php
+	include_once('database.php');
+
+	class Student extends Database{
+		function __construct($id) {
+			$sql = "SELECT * FROM students WHERE id = $id;";
+			$statement = Database::$db->prepare($sql);
+			$statement->execute();
+			$data = $statement->fetch(PDO::FETCH_ASSOC);
+			if(empty($data)){return;}
+			foreach ($data as $key => $value) {
+				$this->{$key} = $value;
+			}
+		}
+
+		public static function add($name) {
+			$sql = "INSERT INTO students (name) VALUES (?)";
+			Database::$db->prepare($sql)->execute([$name]);
+		}
+
+		public function delete() {
+			$sql = "DELETE FROM students WHERE id = $this->id;";
+			Database::$db->query($sql);
+		}
+
+		public function save() {
+			$sql = "UPDATE students SET name = ? WHERE id = ?;";
+			Database::$db->prepare($sql)->execute([$this->name, $this->id]);
+		}
+
+		public static function all($keyword) {
+			$keyword = str_replace(" ", "%", $keyword);
+			$sql = "SELECT * FROM students WHERE name like ('%$keyword%');";
+			$statement = Database::$db->prepare($sql);
+			$statement->execute();
+			$students = [];
+			while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+				$students[] = new Student($row['id']);
+			}
+			return $students;
+		}
+	}
+?>
+
+
+
+//common.php
+
+
+<?php
+  function safeGet($name, $default = null){
+    return (isset($_REQUEST[$name]))?$_REQUEST[$name]:$default;
+  }
+
+?>
+
+
+
+
+//deletecourse
+
+<?php
+	header('Content-Type: application/json; charset=utf-8');
+	include_once("C:/xampp/htdocs/school/real/courses.php");
+	Database::connect('school', 'root', '');
+	$student = new Courses($_GET['id']);
+	$student->delete();
+	echo json_encode(['status'=>1]);
+?>
+
+
+//deletegrade.php
+
+<?php
+	header('Content-Type: application/json; charset=utf-8');
+	include_once("../models/grade.php");
+	Database::connect('school', 'root', '');
+	$student = new Grade($_GET['id']);
+	$student->delete();
+	echo json_encode(['status'=>1]);
+?>
+
+
+
+//deletestudent.php
+
+
+<?php
+	header('Content-Type: application/json; charset=utf-8');
+	include_once("../models/student.php");
+	Database::connect('school', 'root', '');
+	$student = new Student($_GET['id']);
+	$student->delete();
+	echo json_encode(['status'=>1]);
+?>
+
+
+//savecourse.php
+
+<?php
+	include_once("../controllers/common.php");
+	include_once("C:/xampp/htdocs/school/real/courses.php");
+	Database::connect('school', 'root', '');
+	$id = safeGet("id", 0);
+	if($id==0) {
+		Courses::add(safeGet("name"),safeGet("max_degree"),safeGet("study_year"));
+  //Courses::insetring(safeGet("name"));
+	} else {
+		$student = new Courses($id);
+		$student->name = safeGet("name");
+    $student->max_degree = safeGet("max_degree");
+    $student->study_year = safeGet("study_year");
+		$student->save();
+	}
+	header('Location: ../course.php');
+?>
+
+
+//savegrade.php
+
+
+<?php
+include_once("../controllers/common.php");
+include_once("C:/xampp/htdocs/school/real/grade.php");
+Database::connect('school', 'root', '');
+$id = safeGet("id", 0);
+if($id==0) {
+		Grade::add(safeGet("student_id"),safeGet("course_id"),safeGet("degree"),safeGet("examine_at"));
+	} else {
+		$student = new Grade($id);
+		$student->student_id = safeGet("student_id");
+    $student->course_id = safeGet("course_id");
+    $student->degree= safeGet("degree");
+    $student->examine_at = safeGet("examine_at");
+		$student->save();
+	}
+	header('Location: ../grades.php');
+?>
+
+
+
+
+//savestudent.php
+
+
+<?php
+	include_once("../controllers/common.php");
+	include_once("../models/student.php");
+	Database::connect('school', 'root', '');
+	$id = safeGet("id", 0);
+	if($id==0) {
+		Student::add(safeGet("name"));
+	} else {
+		$student = new Student($id);
+		$student->name = safeGet("name");
+		$student->save();
+	}
+	header('Location: ../students.php');
+?>
+
+
+
+//head.php
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./images/favicon.ico">
+
+    <title>SIS - School Information System</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./css/sticky-footer-navbar.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">SIS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href=".">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./students.php">Students</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./course.php">Courses</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./grades.php">Grades</a>
+            </li>
+          </ul>
+          <form action="./students.php" class="form-inline mt-2 mt-md-0">
+            <input class="form-control mr-sm-2" type="text" name="keywords" placeholder="Search" aria-label="Search" value="<?=safeGet('keywords')?>">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </div>
+      </nav>
+    </header>
+    <!-- Begin page content -->
+    <main role="main" class="container">
+    
+    
+    
+    
+    //tail.php
+    
+        </main>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Copyright 2018, Software Engineering Course, ASUENG.</span>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./js/jquery.min.js">
+    <script src="./js/popper.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+  </body>
+</html>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
