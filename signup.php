@@ -33,14 +33,15 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="index.php">Home <span class="sr-only">(current)</span></a></li>
+      <!--  <li class="active"><a href="index.php">Home <span class="sr-only">(current)</span></a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact</a></li>
+      --> 
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="signup.php">Sign Up <i class="fa fa-user-plus"></i></a></li>
-        <li><a href="#">Login <i class="fa fa-user"></i></a></li>
-         <li><a href="#">Logout <i class="fa fa-user"></i></a></li>
+        <li><a href="header.php">Login <i class="fa fa-user"></i></a></li>
+        <!-- <li><a href="#">Logout <i class="fa fa-user"></i></a></li> -->
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -81,7 +82,7 @@
   </div>
 </form>
 -->
-	<div class="wrapper-main">
+	<!--<div class="wrapper-main">
 		<section class="section-default">
 		<h1>Signup</h1>
 		<form action="include/signup.inc.php" method="POST">
@@ -92,7 +93,45 @@
 			<button type="submit" name="submit" >Signup </button>
 		</form>
 	</section>
-</div>
+</div> -->
+<form class="form-horizontal" action="/action_page.php">
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="fname">First name:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="fname" placeholder="Your First name">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="lname">Last Name:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="lname" placeholder="Your last name ">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="email">Email:</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="email" placeholder="Enter email">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="pwd">Password:</label>
+    <div class="col-sm-10"> 
+      <input type="password" class="form-control" id="pwd" placeholder="Enter password">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="pwd">Repeat Password:</label>
+    <div class="col-sm-10"> 
+      <input type="password" class="form-control" id="pwd" placeholder="Repeat password">
+    </div>
+  </div>
+  
+  <div class="form-group"> 
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
 </main>
 
 </body>

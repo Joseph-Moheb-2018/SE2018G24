@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +13,7 @@
   integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
   crossorigin="anonymous"></script>
   <link rel="stylesheet" type="text/css" href="app.css">
+
   <link href="https://fonts.googleapis.com/css?family=Mali|Source+Sans+Pro" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
 
@@ -33,14 +38,15 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
+       <!-- <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact</a></li>
+      -->
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="signup.php">Sign Up <i class="fa fa-user-plus"></i></a></li>
-        <li><a href="#">Login <i class="fa fa-user"></i></a></li>
-         <li><a href="#">Logout <i class="fa fa-user"></i></a></li>
+        <li><a href="header.php">Login <i class="fa fa-user"></i></a></li>
+       <!--  <li><a href="#">Logout <i class="fa fa-user"></i></a></li> -->
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -48,28 +54,34 @@
 
 	<div class="container">
 		<div class="row">
-		
+
 		<div class="col-lg-12">
 			<div id="content">
 				<h1>Health Me</h1>
 				<h3>Where Dreams Come True</h3>
-				
+
 				<hr>
-				
-				<form class="form-inline">
- 	 <div class="form-group">
-  	  <label for="exampleInputName2">Name</label>
-  	  <input type="text" class="form-control" id="	exampleInputName2" placeholder="Jane Doe">
- 	 </div>
- 	 <div class="form-group">
-  	  <label for="exampleInputEmail2">Email</label>
-  	  <input type="email" class="form-control" id="	exampleInputEmail2" placeholder="jane.doe@example.com">
- 	 </div>
- 	 <button type="submit" class="btn btn-default">Get Started</button>
+				<form method="POST" action="../gogooo/include/login.inc.php">
+				<div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    <input type="text" class="form-control" name="mailuid" aria-describedby="emailHelp" placeholder="Enter email">
+    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" class="form-control" name="pwd" placeholder="Password">
+  </div>
+  <!--<div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+  </div>
+-->
+  <button name="login-submit" type="submit" class="btn btn-primary">Submit</button>
 </form>
+
 				</div>
 				</div>
-			
+
 		</div>
 
 
