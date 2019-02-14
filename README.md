@@ -4,7 +4,7 @@ It will include a lot of features as Full In body profile and recipes.
 
 The final SRS file is called "SRS Template Final"
 
-The final BRD file is called "BRD.pdf"
+The final BRD file is called "BRD.pdf"   https://github.com/Joseph-Moheb-2018/SE2018G24/blob/master/BRD.pdf
 
 Our website all files is in the zip file "Health Me- master"
 
