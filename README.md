@@ -15,10 +15,10 @@ Link to the website is    http://prima-mode.000webhostapp.com/
 a made account profile is e-mail: michomicho@gmail.com
                           password : 456
 
-Team Members are : Joseph Moheb Mourice    Section 1 
-                   Marina Ashraf Nabil     Section 2 
-                   George Maged Boushra    Section 1 
-                   Habib Samir Habib       Section 1 
-                   Mario Hany Nicola       Section 3
-                   Martina Osama Gris      Section 2
+Team Members are : (Joseph Moheb Mourice    Section 1) 
+                   (Marina Ashraf Nabil     Section 2) 
+                   (George Maged Boushra    Section 1) 
+                   (Habib Samir Habib       Section 1) 
+                   (Mario Hany Nicola       Section 3)
+                   (Martina Osama Gris      Section 2)
                    
