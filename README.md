@@ -2,7 +2,7 @@
 Our project is about making a nutrition website called "Health Me"
 It will include a lot of features as Full In body profile and recipes.
 
-The final SRS file is called "SRS Template Final"
+The final SRS file is called "SRS Template Final"  https://github.com/Joseph-Moheb-2018/SE2018G24/blob/master/SRS%20Template%20Final.pdf
 
 The final BRD file is called "BRD.pdf"   https://github.com/Joseph-Moheb-2018/SE2018G24/blob/master/BRD.pdf
 
